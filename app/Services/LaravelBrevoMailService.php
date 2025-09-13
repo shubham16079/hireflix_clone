@@ -10,7 +10,7 @@ class LaravelBrevoMailService
     /**
      * Send interview invitation email using Laravel Mail with Brevo SMTP
      */
-    public function sendInterviewInvitation($candidateEmail, $candidateName, $interviewTitle, $interviewLink, $companyName = 'Hireflix')
+    public function sendInterviewInvitation($candidateEmail, $candidateName, $interviewTitle, $interviewLink, $companyName = 'Hireflix Clone')
     {
         try {
             Mail::send('emails.interview-invitation', [
@@ -42,7 +42,7 @@ class LaravelBrevoMailService
     /**
      * Send reviewer invitation email using Laravel Mail with Brevo SMTP
      */
-    public function sendReviewerInvitation($reviewerEmail, $interviewTitle, $submissionsLink, $message = '', $companyName = 'Hireflix')
+    public function sendReviewerInvitation($reviewerEmail, $interviewTitle, $submissionsLink, $message = '', $companyName = 'Hireflix Clone')
     {
         try {
             Mail::send('emails.reviewer-invitation', [

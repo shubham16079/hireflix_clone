@@ -118,16 +118,41 @@ chmod -R 775 bootstrap/cache
    MAIL_FROM_NAME="Hireflix Clone"
    ```
 
-### Step 7: Create Admin User
+### Step 7: Create Default Users & Sample Data
 
+**Option 1: Quick Setup (Recommended)**
 ```bash
-# Run the seeder to create an admin user
-php artisan db:seed --class=UserSeeder
+# Run the automated setup script
+# Linux/Mac:
+chmod +x setup.sh && ./setup.sh
+
+# Windows:
+setup.bat
 ```
 
-**Default Admin Credentials:**
-- Email: `admin@hireflix.com`
-- Password: `password`
+**Option 2: Manual Setup**
+```bash
+# Run the seeder to create default users and sample data
+php artisan db:seed
+```
+
+**Default User Credentials:**
+
+#### 🔑 Admin Users
+- **Email:** `admin@hireflixclone.com` | **Password:** `password`
+- **Email:** `hr@hireflixclone.com` | **Password:** `password`
+
+#### 👥 Reviewer Users
+- **Email:** `reviewer@hireflixclone.com` | **Password:** `password`
+- **Email:** `john.reviewer@hireflixclone.com` | **Password:** `password`
+
+#### 💡 Candidate Access
+- Candidates don't need accounts - they access interviews via email links sent to them
+
+**Sample Data Included:**
+- 3 sample interviews (Software Developer, Marketing Manager, Customer Support)
+- Pre-configured questions for each interview type
+- Ready-to-use for testing and demonstration
 
 ### Step 8: Start the Application
 

@@ -3,8 +3,11 @@
 @section('title', 'Sign In')
 
 @section('content')
-<div class="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full">
-    <h2 class="text-2xl font-bold text-center mb-6">Sign in to Your Account</h2>
+<div class="max-w-md w-full">
+    @include('auth.login-credentials')
+    
+    <div class="bg-white p-8 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-bold text-center mb-6">Sign in to Your Account</h2>
 
     <form method="POST" action="{{ route('login') }}">
         @csrf
@@ -40,8 +43,9 @@
         </button>
     </form>
 
-    <p class="text-center text-sm text-gray-600 mt-4">
-        Don't have an account? <a href="{{ route('register') }}" class="text-blue-600 hover:underline">Sign Up</a>
-    </p>
+        <p class="text-center text-sm text-gray-600 mt-4">
+            Don't have an account? <a href="{{ route('register') }}" class="text-blue-600 hover:underline">Sign Up</a>
+        </p>
+    </div>
 </div>
 @endsection
