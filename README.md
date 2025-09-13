@@ -41,7 +41,7 @@ Before you begin, ensure you have the following installed:
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/hireflix-clone.git
+git clone https://github.com/shubham16079/hireflix_clone.git
 cd hireflix-clone
 ```
 
