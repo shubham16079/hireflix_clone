@@ -4,19 +4,15 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
         <div>
             <h4 class="font-medium text-blue-700 mb-2">Admin Users</h4>
-            <div class="space-y-1 text-blue-600">
-                <div>📧 admin@hireflixclone.com</div>
-                <div>🔑 password</div>
-                <div class="mt-2">📧 hr@hireflixclone.com</div>
+            <div class="space-y-1 text-white-600">
+                <div>admin@hireflixclone.com</div>
                 <div>🔑 password</div>
             </div>
         </div>
         <div>
             <h4 class="font-medium text-blue-700 mb-2">Reviewer Users</h4>
-            <div class="space-y-1 text-blue-600">
-                <div>📧 reviewer@hireflixclone.com</div>
-                <div>🔑 password</div>
-                <div class="mt-2">📧 john.reviewer@hireflixclone.com</div>
+            <div class="space-y-1 text-white-600">
+                <div class="mt-2">shubham27844872@gmail.com</div>
                 <div>🔑 password</div>
             </div>
         </div>

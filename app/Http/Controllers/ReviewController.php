@@ -17,6 +17,19 @@ class ReviewController extends Controller
     {
         $query = Review::with(['submission.interview', 'reviewer']);
 
+        // Apply access control based on user role
+        if (Auth::user()->role === 'admin') {
+            // Admin can see all reviews
+        } elseif (Auth::user()->role === 'reviewer') {
+            // Reviewers can only see their own reviews
+            $query->where('reviewer_id', Auth::id());
+        } else {
+            // Interview creators can see reviews for their interviews
+            $query->whereHas('submission.interview', function($q) {
+                $q->where('created_by', Auth::id());
+            });
+        }
+
         // Filter by reviewer
         if ($request->has('reviewer_id')) {
             $query->where('reviewer_id', $request->reviewer_id);
@@ -39,8 +52,17 @@ class ReviewController extends Controller
 
         $reviews = $query->orderBy('created_at', 'desc')->paginate(20);
 
-        // Get interviews for filter dropdown
-        $interviews = Interview::where('created_by', Auth::id())->get();
+        // Get interviews for filter dropdown based on user role
+        if (Auth::user()->role === 'admin') {
+            $interviews = Interview::all();
+        } elseif (Auth::user()->role === 'reviewer') {
+            // Get interviews where user is assigned as reviewer
+            $interviews = Interview::whereHas('reviewAssignments', function($q) {
+                $q->where('reviewer_id', Auth::id());
+            })->get();
+        } else {
+            $interviews = Interview::where('created_by', Auth::id())->get();
+        }
 
         return view('reviews.index', compact('reviews', 'interviews'));
     }
@@ -51,7 +73,26 @@ class ReviewController extends Controller
     public function create(Submission $submission)
     {
         // Check if user has access to this submission
-        if ($submission->interview->created_by !== Auth::id() && !Auth::user()->hasRole('admin')) {
+        $hasAccess = false;
+        
+        // Admin can access all submissions
+        if (Auth::user()->role === 'admin') {
+            $hasAccess = true;
+        }
+        // Interview creator can access their submissions
+        elseif ($submission->interview->created_by === Auth::id()) {
+            $hasAccess = true;
+        }
+        // Reviewer can access if they are assigned to review this interview
+        elseif (Auth::user()->role === 'reviewer') {
+            $assignment = \App\Models\ReviewAssignment::where('interview_id', $submission->interview_id)
+                ->where('reviewer_id', Auth::id())
+                ->where('status', 'accepted')
+                ->first();
+            $hasAccess = $assignment !== null;
+        }
+        
+        if (!$hasAccess) {
             abort(403, 'You do not have access to this submission.');
         }
 
@@ -79,7 +120,26 @@ class ReviewController extends Controller
     public function store(Request $request, Submission $submission)
     {
         // Check if user has access to this submission
-        if ($submission->interview->created_by !== Auth::id() && !Auth::user()->hasRole('admin')) {
+        $hasAccess = false;
+        
+        // Admin can access all submissions
+        if (Auth::user()->role === 'admin') {
+            $hasAccess = true;
+        }
+        // Interview creator can access their submissions
+        elseif ($submission->interview->created_by === Auth::id()) {
+            $hasAccess = true;
+        }
+        // Reviewer can access if they are assigned to review this interview
+        elseif (Auth::user()->role === 'reviewer') {
+            $assignment = \App\Models\ReviewAssignment::where('interview_id', $submission->interview_id)
+                ->where('reviewer_id', Auth::id())
+                ->where('status', 'accepted')
+                ->first();
+            $hasAccess = $assignment !== null;
+        }
+        
+        if (!$hasAccess) {
             abort(403, 'You do not have access to this submission.');
         }
 
@@ -117,7 +177,7 @@ class ReviewController extends Controller
         // Check if user has access to this review
         if ($review->submission->interview->created_by !== Auth::id() && 
             $review->reviewer_id !== Auth::id() && 
-            !Auth::user()->hasRole('admin')) {
+            Auth::user()->role !== 'admin') {
             abort(403, 'You do not have access to this review.');
         }
 
@@ -136,7 +196,7 @@ class ReviewController extends Controller
     public function edit(Review $review)
     {
         // Check if user can edit this review
-        if ($review->reviewer_id !== Auth::id() && !Auth::user()->hasRole('admin')) {
+        if ($review->reviewer_id !== Auth::id() && Auth::user()->role !== 'admin') {
             abort(403, 'You can only edit your own reviews.');
         }
 
@@ -154,7 +214,7 @@ class ReviewController extends Controller
     public function update(Request $request, Review $review)
     {
         // Check if user can edit this review
-        if ($review->reviewer_id !== Auth::id() && !Auth::user()->hasRole('admin')) {
+        if ($review->reviewer_id !== Auth::id() && Auth::user()->role !== 'admin') {
             abort(403, 'You can only edit your own reviews.');
         }
 
@@ -178,7 +238,7 @@ class ReviewController extends Controller
     public function destroy(Review $review)
     {
         // Check if user can delete this review
-        if ($review->reviewer_id !== Auth::id() && !Auth::user()->hasRole('admin')) {
+        if ($review->reviewer_id !== Auth::id() && Auth::user()->role !== 'admin') {
             abort(403, 'You can only delete your own reviews.');
         }
 
@@ -195,7 +255,26 @@ class ReviewController extends Controller
     public function forSubmission(Submission $submission)
     {
         // Check if user has access to this submission
-        if ($submission->interview->created_by !== Auth::id() && !Auth::user()->hasRole('admin')) {
+        $hasAccess = false;
+        
+        // Admin can access all submissions
+        if (Auth::user()->role === 'admin') {
+            $hasAccess = true;
+        }
+        // Interview creator can access their submissions
+        elseif ($submission->interview->created_by === Auth::id()) {
+            $hasAccess = true;
+        }
+        // Reviewer can access if they are assigned to review this interview
+        elseif (Auth::user()->role === 'reviewer') {
+            $assignment = \App\Models\ReviewAssignment::where('interview_id', $submission->interview_id)
+                ->where('reviewer_id', Auth::id())
+                ->where('status', 'accepted')
+                ->first();
+            $hasAccess = $assignment !== null;
+        }
+        
+        if (!$hasAccess) {
             abort(403, 'You do not have access to this submission.');
         }
 

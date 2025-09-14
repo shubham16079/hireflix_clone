@@ -67,4 +67,12 @@ class Interview extends Model
     {
         return $this->hasMany(Submission::class);
     }
+
+    /**
+     * Get the review assignments for the interview.
+     */
+    public function reviewAssignments(): HasMany
+    {
+        return $this->hasMany(ReviewAssignment::class);
+    }
 }

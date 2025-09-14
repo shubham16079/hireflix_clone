@@ -11,7 +11,7 @@
             <p class="text-gray-600 mt-2">{{ $review->submission->candidate_name }} - {{ $review->submission->interview->title }}</p>
         </div>
         <div class="flex space-x-4">
-            @if($review->reviewer_id === Auth::id() || Auth::user()->hasRole('admin'))
+            @if($review->reviewer_id === Auth::id() || Auth::user()->role === 'admin')
                 <a href="{{ route('reviews.edit', $review) }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300">
                     ✏️ Edit Review
                 </a>
@@ -177,7 +177,7 @@
             </div>
 
             <!-- Actions -->
-            @if($review->reviewer_id === Auth::id() || Auth::user()->hasRole('admin'))
+            @if($review->reviewer_id === Auth::id() || Auth::user()->role === 'admin')
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-4">⚙️ Actions</h3>
                     <div class="space-y-3">

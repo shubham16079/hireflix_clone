@@ -62,4 +62,20 @@ class User extends Authenticatable
     {
         return $this->hasMany(Review::class, 'reviewer_id');
     }
+
+    /**
+     * Get the review assignments for this user
+     */
+    public function reviewAssignments()
+    {
+        return $this->hasMany(ReviewAssignment::class, 'reviewer_id');
+    }
+
+    /**
+     * Get the review assignments created by this user
+     */
+    public function assignedReviews()
+    {
+        return $this->hasMany(ReviewAssignment::class, 'assigned_by');
+    }
 }

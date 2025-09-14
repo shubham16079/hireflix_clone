@@ -175,9 +175,42 @@ class InterviewController extends Controller
             $reviewerEmails = array_filter(array_map('trim', explode(',', $request->input('reviewer_emails'))));
             
             $submissionsLink = route('submissions.for-interview', $interview);
+            $assignedCount = 0;
             
             foreach ($reviewerEmails as $email) {
                 if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    // Find or create user with this email
+                    $reviewer = \App\Models\User::where('email', $email)->first();
+                    
+                    if (!$reviewer) {
+                        // Create a new user account for the reviewer
+                        $reviewer = \App\Models\User::create([
+                            'name' => explode('@', $email)[0], // Use email prefix as name
+                            'email' => $email,
+                            'password' => \Hash::make(\Str::random(12)), // Random password
+                            'role' => 'reviewer',
+                        ]);
+                    }
+                    
+                    // Check if reviewer is already assigned to this interview
+                    $existingAssignment = \App\Models\ReviewAssignment::where('interview_id', $interview->id)
+                        ->where('reviewer_id', $reviewer->id)
+                        ->first();
+                    
+                    if (!$existingAssignment) {
+                        // Create review assignment
+                        \App\Models\ReviewAssignment::create([
+                            'interview_id' => $interview->id,
+                            'reviewer_id' => $reviewer->id,
+                            'assigned_by' => Auth::id(),
+                            'status' => 'assigned',
+                            'message' => $request->input('message', ''),
+                            'assigned_at' => now(),
+                        ]);
+                        $assignedCount++;
+                    }
+                    
+                    // Send email invitation
                     $brevoService->sendReviewerInvitation(
                         $email,
                         $interview->title,
@@ -188,7 +221,7 @@ class InterviewController extends Controller
             }
 
             return redirect()->route('interviews.show', $interview)
-                ->with('success', 'Reviewer invitations sent successfully to ' . count($reviewerEmails) . ' reviewer(s)');
+                ->with('success', 'Reviewer invitations sent successfully to ' . count($reviewerEmails) . ' reviewer(s). ' . $assignedCount . ' new assignments created.');
         } catch (\Exception $e) {
             \Log::error('Failed to send reviewer invitations', [
                 'error' => $e->getMessage(),

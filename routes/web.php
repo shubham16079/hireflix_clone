@@ -46,6 +46,12 @@ Route::middleware(['auth', 'can:access-admin-reviewer-features'])->group(functio
     Route::delete('/reviews/{review}', [App\Http\Controllers\ReviewController::class, 'destroy'])->name('reviews.destroy');
     Route::get('/submissions/{submission}/reviews', [App\Http\Controllers\ReviewController::class, 'forSubmission'])->name('reviews.for-submission');
     Route::get('/reviews/statistics', [App\Http\Controllers\ReviewController::class, 'statistics'])->name('reviews.statistics');
+    
+    // Review Assignment routes
+    Route::get('/review-assignments', [App\Http\Controllers\ReviewAssignmentController::class, 'index'])->name('review-assignments.index');
+    Route::get('/review-assignments/{assignment}', [App\Http\Controllers\ReviewAssignmentController::class, 'show'])->name('review-assignments.show');
+    Route::post('/review-assignments/{assignment}/accept', [App\Http\Controllers\ReviewAssignmentController::class, 'accept'])->name('review-assignments.accept');
+    Route::post('/review-assignments/{assignment}/decline', [App\Http\Controllers\ReviewAssignmentController::class, 'decline'])->name('review-assignments.decline');
 });
 
 // Candidate interview routes (no authentication required)

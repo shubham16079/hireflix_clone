@@ -89,12 +89,23 @@
                         <p class="text-sm font-medium text-gray-600">Pending Reviews</p>
                         <p class="text-2xl font-semibold text-gray-900">
                             @php
-                                $pendingReviews = \App\Models\Submission::whereHas('interview', function($q) {
-                                    $q->where('created_by', Auth::id());
-                                })->where('status', 'completed')
-                                ->whereDoesntHave('reviews', function($q) {
-                                    $q->where('reviewer_id', Auth::id());
-                                })->count();
+                                if (Auth::user()->role === 'reviewer') {
+                                    // For reviewers, show submissions they can review
+                                    $pendingReviews = \App\Models\Submission::whereHas('interview.reviewAssignments', function($q) {
+                                        $q->where('reviewer_id', Auth::id())
+                                          ->where('status', 'accepted');
+                                    })->where('status', 'completed')
+                                    ->whereDoesntHave('reviews', function($q) {
+                                        $q->where('reviewer_id', Auth::id());
+                                    })->count();
+                                } else {
+                                    // For interview creators, show their submissions that need reviews
+                                    $pendingReviews = \App\Models\Submission::whereHas('interview', function($q) {
+                                        $q->where('created_by', Auth::id());
+                                    })->where('status', 'completed')
+                                    ->whereDoesntHave('reviews')
+                                    ->count();
+                                }
                             @endphp
                             {{ $pendingReviews }}
                         </p>
@@ -171,14 +182,70 @@
             </div>
         </div>
 
+        @if(Auth::user()->role === 'reviewer')
+            <!-- Review Assignments Section for Reviewers -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">📋 My Review Assignments</h2>
+                @php
+                    $assignments = \App\Models\ReviewAssignment::where('reviewer_id', Auth::id())
+                        ->with('interview')
+                        ->orderBy('created_at', 'desc')
+                        ->take(5)
+                        ->get();
+                @endphp
+                @if($assignments->count() > 0)
+                    <div class="space-y-3">
+                        @foreach($assignments as $assignment)
+                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                <div>
+                                    <h3 class="font-medium text-gray-900">{{ $assignment->interview->title }}</h3>
+                                    <p class="text-sm text-gray-500">Assigned by {{ $assignment->assignedBy->name }}</p>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="px-2 py-1 text-xs rounded-full
+                                        @if($assignment->status === 'accepted') bg-green-100 text-green-800
+                                        @elseif($assignment->status === 'declined') bg-red-100 text-red-800
+                                        @else bg-yellow-100 text-yellow-800 @endif">
+                                        {{ ucfirst($assignment->status) }}
+                                    </span>
+                                    @if($assignment->status === 'assigned')
+                                        <form method="POST" action="{{ route('review-assignments.accept', $assignment) }}" class="inline">
+                                            @csrf
+                                            <button type="submit" class="text-green-600 hover:text-green-800 text-sm">Accept</button>
+                                        </form>
+                                        <form method="POST" action="{{ route('review-assignments.decline', $assignment) }}" class="inline">
+                                            @csrf
+                                            <button type="submit" class="text-red-600 hover:text-red-800 text-sm">Decline</button>
+                                        </form>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                    <div class="mt-4 text-center">
+                        <a href="{{ route('review-assignments.index') }}" class="text-blue-600 hover:text-blue-800">
+                            View All Assignments →
+                        </a>
+                    </div>
+                @else
+                    <div class="text-center py-8 text-gray-500">
+                        <p>No review assignments yet.</p>
+                        <p class="text-sm mt-1">You'll receive assignments when interview creators invite you to review submissions.</p>
+                    </div>
+                @endif
+            </div>
+        @endif
+
         <!-- Quick Action Buttons -->
         <div class="bg-white rounded-lg shadow-md p-6">
             <h2 class="text-xl font-semibold text-gray-800 mb-4">🚀 Quick Actions</h2>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <a href="{{ route('interviews.create') }}" class="bg-blue-600 text-white p-4 rounded-lg hover:bg-blue-700 transition duration-300 text-center">
-                    <div class="text-2xl mb-2">➕</div>
-                    <div class="font-semibold">Create Interview</div>
-                </a>
+                @if(Auth::user()->role !== 'reviewer')
+                    <a href="{{ route('interviews.create') }}" class="bg-blue-600 text-white p-4 rounded-lg hover:bg-blue-700 transition duration-300 text-center">
+                        <div class="text-2xl mb-2">➕</div>
+                        <div class="font-semibold">Create Interview</div>
+                    </a>
+                @endif
                 <a href="{{ route('interviews.index') }}" class="bg-green-600 text-white p-4 rounded-lg hover:bg-green-700 transition duration-300 text-center">
                     <div class="text-2xl mb-2">📋</div>
                     <div class="font-semibold">View Interviews</div>

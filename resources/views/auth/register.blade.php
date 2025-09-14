@@ -38,10 +38,6 @@
                     <input type="radio" name="role" value="reviewer" class="form-radio text-blue-600" required>
                     <span class="ml-2 text-sm text-gray-700">Reviewer</span>
                 </label>
-                <label class="inline-flex items-center">
-                    <input type="radio" name="role" value="candidate" class="form-radio text-blue-600" required checked>
-                    <span class="ml-2 text-sm text-gray-700">Candidate</span>
-                </label>
             </div>
             @error('role')
                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>

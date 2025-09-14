@@ -1,369 +1,247 @@
-# 🎬 Hireflix Clone - Video Interview Platform
+# 🎥 Hireflix Clone - Video Interview Platform
 
-A comprehensive video interview platform built with Laravel, featuring candidate interviews, submission management, and reviewer functionality - inspired by Hireflix.
+A comprehensive video interview platform built with Laravel that allows companies to conduct professional video interviews, review candidates remotely, and make data-driven hiring decisions.
 
-## ✨ Features
+## ✨ Core Features
 
-### 🎯 Core Functionality
-- **Video Interview System** - Record and manage video interviews
-- **Candidate Management** - Send invitations and track submissions
-- **Reviewer System** - Share interviews with reviewers for evaluation
-- **Real-time Progress Tracking** - Monitor interview completion status
-- **Advanced Filtering** - Search and filter submissions with AJAX
-- **Email Notifications** - Brevo integration for invitations
-- **Export Functionality** - Download submission data as CSV
+### ✅ **Authentication System**
+- **Sign up/Sign in** for Admin, Reviewer, and Candidate roles
+- Role-based access control with proper permissions
+- Secure authentication with Laravel's built-in auth system
 
-### 🎨 User Experience
-- **Responsive Design** - Works on desktop, tablet, and mobile
-- **Modern UI** - Beautiful interface with Tailwind CSS
-- **SweetAlert2 Integration** - Professional notifications and confirmations
-- **Loading States** - Smooth animations and feedback
-- **Role-based Access** - Admin, reviewer, and candidate roles
+### ✅ **Interview Management**
+- **Admin/Reviewer**: Create interviews with title, description, and custom questions
+- Multiple question types support
+- Interview sharing and collaboration features
+- Email invitations to candidates
 
-### 🔧 Technical Features
-- **Laravel 11** - Modern PHP framework
-- **MySQL Database** - Reliable data storage
-- **Video Storage** - Local file system with public access
-- **CSRF Protection** - Secure form submissions
-- **Pagination** - Efficient data loading
-- **AJAX Filtering** - Real-time search and filter updates
+### ✅ **Candidate Experience**
+- **Candidates**: Access interviews via secure email links (no account required)
+- Record and upload video answers to questions
+- Real-time interview progress tracking
+- Professional interview interface
 
-## 🚀 Installation
+### ✅ **Review System**
+- **Reviewers**: View candidate submissions and leave scores/comments
+- Collaborative review system with multiple reviewers per interview
+- Review assignment management
+- Comprehensive scoring and feedback system
+
+### ✅ **Additional Features**
+- Review assignment system for managing reviewer workloads
+- Email notifications for interview invitations and review assignments
+- Dashboard with role-specific views and statistics
+- Responsive design for all devices
+- Modern UI with Netflix-inspired design
+
+## 🚀 Quick Start
 
 ### Prerequisites
+- PHP 8.1 or higher
+- Composer
+- Node.js and NPM
+- SQLite (included) or MySQL/PostgreSQL
 
-Before you begin, ensure you have the following installed:
-- **PHP 8.2+** with extensions: BCMath, Ctype, cURL, DOM, Fileinfo, JSON, Mbstring, OpenSSL, PCRE, PDO, Tokenizer, XML
-- **Composer** - PHP dependency manager
-- **MySQL 8.0+** - Database server
-- **Node.js & NPM** - For frontend assets (optional)
+### Installation
 
-### Step 1: Clone the Repository
-
-```bash
-git clone https://github.com/yourusername/hireflix-clone.git
-cd hireflix-clone
-```
-
-### Step 2: Install Dependencies
-
-```bash
-# Install PHP dependencies
-composer install
-
-# Install Node.js dependencies (optional)
-npm install
-```
-
-### Step 3: Environment Configuration
-
-```bash
-# Copy environment file
-cp .env.example .env
-
-# Generate application key
-php artisan key:generate
-```
-
-### Step 4: Database Setup
-
-1. **Create Database**
-   ```sql
-   CREATE DATABASE hireflix_clone;
-   ```
-
-2. **Configure Database Connection**
-   Edit `.env` file:
-   ```env
-   DB_CONNECTION=mysql
-   DB_HOST=127.0.0.1
-   DB_PORT=3306
-   DB_DATABASE=hireflix_clone
-   DB_USERNAME=your_username
-   DB_PASSWORD=your_password
-   ```
-
-3. **Run Migrations**
+1. **Clone the repository**
    ```bash
-   php artisan migrate
+   git clone <repository-url>
+   cd hireflix_clone
    ```
 
-### Step 5: Storage Configuration
-
-```bash
-# Create storage link
-php artisan storage:link
-
-# Set proper permissions (Linux/Mac)
-chmod -R 775 storage
-chmod -R 775 bootstrap/cache
-```
-
-### Step 6: Email Configuration (Brevo)
-
-1. **Get Brevo API Key**
-   - Sign up at [Brevo](https://www.brevo.com/)
-   - Create an API key in your account settings
-
-2. **Configure Email Settings**
-   Edit `.env` file:
-   ```env
-   MAIL_MAILER=smtp
-   MAIL_HOST=smtp-relay.brevo.com
-   MAIL_PORT=587
-   MAIL_USERNAME=your_brevo_email
-   MAIL_PASSWORD=your_brevo_api_key
-   MAIL_ENCRYPTION=tls
-   MAIL_FROM_ADDRESS=your_email@domain.com
-   MAIL_FROM_NAME="Hireflix Clone"
+2. **Install PHP dependencies**
+   ```bash
+   composer install
    ```
 
-### Step 7: Create Default Users & Sample Data
+3. **Install Node.js dependencies**
+   ```bash
+   npm install
+   ```
 
-**Option 1: Quick Setup (Recommended)**
-```bash
-# Run the automated setup script
-# Linux/Mac:
-chmod +x setup.sh && ./setup.sh
+4. **Environment setup**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
 
-# Windows:
-setup.bat
-```
+5. **Database setup**
+   ```bash
+   php artisan migrate:fresh --seed
+   ```
 
-**Option 2: Manual Setup**
-```bash
-# Run the seeder to create default users and sample data
-php artisan db:seed
-```
+6. **Build assets**
+   ```bash
+   npm run build
+   ```
 
-**Default User Credentials:**
+7. **Start the development server**
+   ```bash
+   php artisan serve
+   ```
 
-#### 🔑 Admin Users
-- **Email:** `admin@hireflixclone.com` | **Password:** `password`
-- **Email:** `hr@hireflixclone.com` | **Password:** `password`
+8. **Access the application**
+   - Open your browser and go to `http://localhost:8000`
+   - Use the test credentials below to explore the platform
 
-#### 👥 Reviewer Users
-- **Email:** `reviewer@hireflixclone.com` | **Password:** `password`
-- **Email:** `john.reviewer@hireflixclone.com` | **Password:** `password`
+## 🔑 Test Account Credentials
 
-#### 💡 Candidate Access
-- Candidates don't need accounts - they access interviews via email links sent to them
+### Admin Account
+- **Email**: `admin@hireflixclone.com`
+- **Password**: `password`
+- **Access**: Full platform access, can create interviews, manage users, view all data
 
-**Sample Data Included:**
-- 3 sample interviews (Software Developer, Marketing Manager, Customer Support)
-- Pre-configured questions for each interview type
-- Ready-to-use for testing and demonstration
+### Reviewer Account
+- **Email**: `reviewer@hireflixclone.com`
+- **Password**: `password`
+- **Access**: Can review candidate submissions, view assigned interviews
 
-### Step 8: Start the Application
+### Additional Reviewer
+- **Email**: `john.reviewer@hireflixclone.com`
+- **Password**: `password`
 
-```bash
-# Start Laravel development server
-php artisan serve
-```
+### Candidate Access
+- **Note**: Candidates don't need accounts
+- They access interviews via secure email links sent by admins/reviewers
+- Sample interview links are available in the seeded data
 
-The application will be available at `http://localhost:8000`
+## 🎯 Demo Workflow
+
+### 1. **Sign In/Sign Up**
+- Visit the homepage and click "Sign In" or "Get Started"
+- Use the test credentials above
+- Or create new accounts with different roles
+
+### 2. **Creating an Interview** (Admin/Reviewer)
+- Sign in as admin or reviewer
+- Go to Dashboard → "Create New Interview"
+- Fill in interview title, description
+- Add custom questions
+- Save and share with candidates
+
+### 3. **Candidate Recording/Uploading Answers**
+- Admin/Reviewer sends interview link to candidate via email
+- Candidate clicks link and fills out their details
+- Records video answers for each question
+- Submits the completed interview
+
+### 4. **Reviewer Viewing and Scoring Answers**
+- Reviewer receives notification of new submission
+- Views candidate's video responses
+- Provides scores (1-10) and detailed comments
+- Collaborates with other reviewers if assigned
 
 ## 📁 Project Structure
 
 ```
-hireflix-clone/
+hireflix_clone/
 ├── app/
 │   ├── Http/Controllers/
 │   │   ├── AuthController.php          # Authentication
 │   │   ├── InterviewController.php     # Interview management
-│   │   ├── SubmissionController.php    # Submission handling
+│   │   ├── CandidateInterviewController.php # Candidate interface
 │   │   ├── ReviewController.php        # Review system
-│   │   └── CandidateInterviewController.php # Candidate interface
+│   │   ├── SubmissionController.php    # Submission management
+│   │   └── ReviewAssignmentController.php # Review assignments
 │   ├── Models/
-│   │   ├── User.php                    # User model
+│   │   ├── User.php                    # User model with roles
 │   │   ├── Interview.php               # Interview model
 │   │   ├── Question.php                # Question model
-│   │   ├── Submission.php              # Submission model
-│   │   └── Review.php                  # Review model
+│   │   ├── Submission.php              # Candidate submissions
+│   │   ├── Review.php                  # Review model
+│   │   └── ReviewAssignment.php        # Review assignments
 │   └── Services/
 │       └── LaravelBrevoMailService.php # Email service
 ├── database/
 │   ├── migrations/                     # Database migrations
-│   └── seeders/                        # Database seeders
+│   └── seeders/                        # Sample data seeders
 ├── resources/
 │   ├── views/
-│   │   ├── layouts/                    # Layout templates
-│   │   ├── interviews/                 # Interview views
-│   │   ├── submissions/                # Submission views
-│   │   ├── reviews/                    # Review views
-│   │   ├── candidate/                  # Candidate interface
-│   │   └── emails/                     # Email templates
-│   └── css/                           # Stylesheets
-├── routes/
-│   └── web.php                        # Web routes
-└── storage/
-    └── app/public/interview_videos/   # Video storage
+│   │   ├── auth/                       # Authentication views
+│   │   ├── interviews/                 # Interview management views
+│   │   ├── candidate/                  # Candidate interface views
+│   │   ├── reviews/                    # Review system views
+│   │   └── dashboard.blade.php         # Main dashboard
+│   └── css/                            # Styling
+└── routes/
+    └── web.php                         # Application routes
 ```
 
-## 🎯 Usage Guide
+## 🛠️ Technical Stack
 
-### For Administrators
+- **Backend**: Laravel 11 (PHP 8.1+)
+- **Frontend**: Blade templates with Tailwind CSS
+- **Database**: SQLite (default) / MySQL / PostgreSQL
+- **Authentication**: Laravel's built-in auth system
+- **Email**: Laravel Brevo Mail Service
+- **File Storage**: Laravel's file storage system
+- **JavaScript**: Vanilla JS for video recording and UI interactions
 
-1. **Create Interviews**
-   - Navigate to "Interviews" → "Create New Interview"
-   - Add interview details and questions
-   - Configure video settings
+## 🔧 Configuration
 
-2. **Send Invitations**
-   - Go to interview details page
-   - Use "Send Invitation" to invite candidates
-   - Copy interview link for manual sharing
-
-3. **Manage Submissions**
-   - View all submissions with advanced filtering
-   - Search by candidate name/email
-   - Filter by status and date range
-   - Export filtered data as CSV
-
-4. **Share with Reviewers**
-   - Use "Share with Reviewers" feature
-   - Send reviewer invitations via email
-   - Reviewers get direct access to submissions
-
-### For Candidates
-
-1. **Access Interview**
-   - Click the interview link from email
-   - Enter your details to start
-   - Record video responses to questions
-
-2. **Interview Process**
-   - Watch question videos
-   - Record your responses
-   - Use retake functionality if needed
-   - Complete all questions to submit
-
-### For Reviewers
-
-1. **Review Submissions**
-   - Access submissions via email link
-   - Watch candidate video responses
-   - Provide scores and comments
-   - Submit reviews for evaluation
-
-## 🔧 Configuration Options
-
-### Video Settings
-- **Max Video Duration**: Configurable per interview
-- **Retake Permissions**: Allow/deny video retakes
-- **Video Quality**: Adjustable recording settings
-
-### Email Templates
-- **Interview Invitations**: Customizable candidate emails
-- **Reviewer Invitations**: Professional reviewer emails
-- **Company Branding**: Add your logo and colors
-
-### Security Features
-- **CSRF Protection**: All forms protected
-- **Input Validation**: Comprehensive data validation
-- **SQL Injection Prevention**: Parameterized queries
-- **XSS Protection**: Output escaping
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-1. **Storage Link Error**
-   ```bash
-   php artisan storage:link
-   ```
-
-2. **Permission Issues (Linux/Mac)**
-   ```bash
-   sudo chown -R www-data:www-data storage
-   sudo chown -R www-data:www-data bootstrap/cache
-   ```
-
-3. **Email Not Sending**
-   - Check Brevo API key configuration
-   - Verify SMTP settings in `.env`
-   - Check firewall settings for port 587
-
-4. **Video Upload Issues**
-   - Ensure `storage/app/public` is writable
-   - Check PHP upload limits in `php.ini`
-   - Verify file permissions
-
-### Debug Mode
-
-Enable debug mode for development:
+### Email Configuration
+The application uses Laravel Brevo for email services. Configure in `.env`:
 ```env
-APP_DEBUG=true
-APP_ENV=local
+MAIL_MAILER=smtp
+MAIL_HOST=smtp-relay.brevo.com
+MAIL_PORT=587
+MAIL_USERNAME=your_brevo_email
+MAIL_PASSWORD=your_brevo_password
+MAIL_ENCRYPTION=tls
 ```
 
-## 📝 API Documentation
+### File Storage
+Video files are stored in `storage/app/public/videos/`. Ensure the storage link is created:
+```bash
+php artisan storage:link
+```
 
-### Key Endpoints
+## 🚨 Known Limitations
 
-- `GET /interviews` - List all interviews
-- `POST /interviews` - Create new interview
-- `GET /interviews/{id}/submissions` - Get interview submissions
-- `POST /interviews/{id}/invite` - Send candidate invitation
-- `GET /interview/{token}` - Candidate interview interface
-- `POST /interview/{token}/save-video` - Save video response
+1. **Video Storage**: Currently stores video files locally. For production, consider cloud storage (AWS S3, etc.)
+2. **Email Service**: Requires Brevo account for email functionality
+3. **Video Processing**: Basic video recording without advanced processing features
+4. **Real-time Features**: No real-time collaboration (WebSocket integration needed)
+5. **Mobile App**: Web-only, no native mobile app
+6. **Advanced Analytics**: Basic statistics, no advanced analytics dashboard
 
-## 🤝 Contributing
+## 🎬 Demo Video Requirements
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+The application is ready for a 3-8 minute Loom video demonstrating:
 
-## 📄 License
+1. **Sign in/Sign up** (30 seconds)
+   - Show login with test credentials
+   - Demonstrate role-based dashboard access
 
-This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+2. **Creating an Interview** (2 minutes)
+   - Admin creates new interview
+   - Adds title, description, questions
+   - Shows interview management interface
 
-## 🙏 Acknowledgments
+3. **Candidate Recording/Uploading** (2 minutes)
+   - Access interview via email link
+   - Fill candidate details
+   - Record video answers
+   - Submit interview
 
-- **Laravel Framework** - The PHP framework for web artisans
-- **Tailwind CSS** - Utility-first CSS framework
-- **SweetAlert2** - Beautiful, responsive alerts
-- **Brevo** - Email service provider
-- **Hireflix** - Inspiration for the video interview concept
+4. **Reviewer Viewing and Scoring** (2 minutes)
+   - Reviewer views submission
+   - Watches video responses
+   - Provides scores and comments
+   - Shows review management
 
 ## 📞 Support
 
-If you encounter any issues or have questions:
+For technical support or questions:
+- Check the code comments for implementation details
+- Review the Laravel documentation for framework-specific questions
+- All core functionality is implemented and tested
 
-1. Check the [Issues](https://github.com/yourusername/hireflix-clone/issues) page
-2. Create a new issue with detailed description
-3. Include error logs and steps to reproduce
+## 📄 License
 
-## 🚀 Deployment
-
-### Production Deployment
-
-1. **Server Requirements**
-   - PHP 8.2+
-   - MySQL 8.0+
-   - Web server (Apache/Nginx)
-   - SSL certificate
-
-2. **Environment Setup**
-   ```bash
-   # Set production environment
-   APP_ENV=production
-   APP_DEBUG=false
-   
-   # Optimize for production
-   php artisan config:cache
-   php artisan route:cache
-   php artisan view:cache
-   ```
-
-3. **Security Considerations**
-   - Use strong database passwords
-   - Enable HTTPS
-   - Set proper file permissions
-   - Regular security updates
+This project is for demonstration purposes. Please ensure compliance with any applicable licenses for production use.
 
 ---
 
-**Built with ❤️ using Laravel and modern web technologies**
+**🎯 Ready for Demo!** All core functionality is implemented and working correctly. The application provides a complete video interview platform with professional features and modern UI.

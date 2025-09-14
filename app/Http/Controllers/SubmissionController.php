@@ -7,6 +7,7 @@ use App\Models\Interview;
 use App\Models\Review;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class SubmissionController extends Controller
 {
@@ -16,6 +17,22 @@ class SubmissionController extends Controller
     public function index(Request $request)
     {
         $query = Submission::with(['interview', 'responses.question', 'reviews.reviewer']);
+
+        // Apply access control based on user role
+        if (Auth::user()->role === 'admin') {
+            // Admin can see all submissions
+        } elseif (Auth::user()->role === 'reviewer') {
+            // Reviewers can only see submissions from interviews they are assigned to
+            $query->whereHas('interview.reviewAssignments', function($q) {
+                $q->where('reviewer_id', Auth::id())
+                  ->where('status', 'accepted');
+            });
+        } else {
+            // Interview creators can see submissions for their interviews
+            $query->whereHas('interview', function($q) {
+                $q->where('created_by', Auth::id());
+            });
+        }
 
         if ($request->filled('interview_id')) {
             $query->where('interview_id', $request->interview_id);
@@ -35,8 +52,17 @@ class SubmissionController extends Controller
 
         $submissions = $query->orderBy('created_at', 'desc')->paginate(20);
 
-        // Get interviews for filter dropdown
-        $interviews = Interview::where('created_by', Auth::id())->get();
+        // Get interviews for filter dropdown based on user role
+        if (Auth::user()->role === 'admin') {
+            $interviews = Interview::all();
+        } elseif (Auth::user()->role === 'reviewer') {
+            // Get interviews where user is assigned as reviewer
+            $interviews = Interview::whereHas('reviewAssignments', function($q) {
+                $q->where('reviewer_id', Auth::id());
+            })->get();
+        } else {
+            $interviews = Interview::where('created_by', Auth::id())->get();
+        }
 
         return view('submissions.index', compact('submissions', 'interviews'));
     }
@@ -47,7 +73,26 @@ class SubmissionController extends Controller
     public function show(Submission $submission)
     {
         // Check if user has access to this submission
-        if ($submission->interview->created_by !== Auth::id() && !Auth::user()->hasRole('admin')) {
+        $hasAccess = false;
+        
+        // Admin can access all submissions
+        if (Auth::user()->role === 'admin') {
+            $hasAccess = true;
+        }
+        // Interview creator can access their submissions
+        elseif ($submission->interview->created_by === Auth::id()) {
+            $hasAccess = true;
+        }
+        // Reviewer can access if they are assigned to review this interview
+        elseif (Auth::user()->role === 'reviewer') {
+            $assignment = \App\Models\ReviewAssignment::where('interview_id', $submission->interview_id)
+                ->where('reviewer_id', Auth::id())
+                ->where('status', 'accepted')
+                ->first();
+            $hasAccess = $assignment !== null;
+        }
+        
+        if (!$hasAccess) {
             abort(403, 'You do not have access to this submission.');
         }
 
@@ -65,8 +110,27 @@ class SubmissionController extends Controller
      */
     public function forInterview(Request $request, Interview $interview)
     {
-        // Check if user owns this interview
-        if ($interview->created_by !== Auth::id()) {
+        // Check if user has access to this interview
+        $hasAccess = false;
+        
+        // Admin can access all interviews
+        if (Auth::user()->role === 'admin') {
+            $hasAccess = true;
+        }
+        // Interview creator can access their interviews
+        elseif ($interview->created_by === Auth::id()) {
+            $hasAccess = true;
+        }
+        // Reviewer can access if they are assigned to review this interview
+        elseif (Auth::user()->role === 'reviewer') {
+            $assignment = \App\Models\ReviewAssignment::where('interview_id', $interview->id)
+                ->where('reviewer_id', Auth::id())
+                ->where('status', 'accepted')
+                ->first();
+            $hasAccess = $assignment !== null;
+        }
+        
+        if (!$hasAccess) {
             abort(403, 'You do not have access to this interview.');
         }
 
@@ -110,7 +174,7 @@ class SubmissionController extends Controller
                         }
                     }
                 } catch (\Exception $e) {
-                    \Log::warning('Invalid date_from format: ' . $dateFrom . ' - ' . $e->getMessage());
+                    Log::warning('Invalid date_from format: ' . $dateFrom . ' - ' . $e->getMessage());
                 }
             }
         }
@@ -127,7 +191,7 @@ class SubmissionController extends Controller
                         }
                     }
                 } catch (\Exception $e) {
-                    \Log::warning('Invalid date_to format: ' . $dateTo . ' - ' . $e->getMessage());
+                    Log::warning('Invalid date_to format: ' . $dateTo . ' - ' . $e->getMessage());
                 }
             }
         }
@@ -149,7 +213,7 @@ class SubmissionController extends Controller
         try {
             $query->orderBy($sortBy, $sortOrder);
         } catch (\Exception $e) {
-            \Log::warning('Error applying sort: ' . $e->getMessage() . ' - sortBy: ' . $sortBy . ', sortOrder: ' . $sortOrder);
+            Log::warning('Error applying sort: ' . $e->getMessage() . ' - sortBy: ' . $sortBy . ', sortOrder: ' . $sortOrder);
             // Fallback to default sorting
             $query->orderBy('created_at', 'desc');
         }
@@ -158,7 +222,7 @@ class SubmissionController extends Controller
         try {
             $submissions = $query->paginate(20)->appends($request->query());
         } catch (\Exception $e) {
-            \Log::error('Error executing submissions query', [
+            Log::error('Error executing submissions query', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
                 'request_params' => $request->all()
@@ -190,7 +254,7 @@ class SubmissionController extends Controller
                     'html' => view('submissions.partials.submissions-table', compact('submissions', 'interview'))->render()
                 ]);
             } catch (\Exception $e) {
-                \Log::error('Error in AJAX submissions response', [
+                Log::error('Error in AJAX submissions response', [
                     'error' => $e->getMessage(),
                     'trace' => $e->getTraceAsString(),
                     'request_params' => $request->all()
@@ -213,8 +277,27 @@ class SubmissionController extends Controller
      */
     public function export(Request $request, Interview $interview)
     {
-        // Check if user owns this interview
-        if ($interview->created_by !== Auth::id()) {
+        // Check if user has access to this interview
+        $hasAccess = false;
+        
+        // Admin can access all interviews
+        if (Auth::user()->role === 'admin') {
+            $hasAccess = true;
+        }
+        // Interview creator can access their interviews
+        elseif ($interview->created_by === Auth::id()) {
+            $hasAccess = true;
+        }
+        // Reviewer can access if they are assigned to review this interview
+        elseif (Auth::user()->role === 'reviewer') {
+            $assignment = \App\Models\ReviewAssignment::where('interview_id', $interview->id)
+                ->where('reviewer_id', Auth::id())
+                ->where('status', 'accepted')
+                ->first();
+            $hasAccess = $assignment !== null;
+        }
+        
+        if (!$hasAccess) {
             abort(403, 'You do not have access to this interview.');
         }
 
@@ -256,7 +339,7 @@ class SubmissionController extends Controller
                         }
                     }
                 } catch (\Exception $e) {
-                    \Log::warning('Invalid date_from format in export: ' . $dateFrom . ' - ' . $e->getMessage());
+                    Log::warning('Invalid date_from format in export: ' . $dateFrom . ' - ' . $e->getMessage());
                 }
             }
         }
@@ -273,7 +356,7 @@ class SubmissionController extends Controller
                         }
                     }
                 } catch (\Exception $e) {
-                    \Log::warning('Invalid date_to format in export: ' . $dateTo . ' - ' . $e->getMessage());
+                    Log::warning('Invalid date_to format in export: ' . $dateTo . ' - ' . $e->getMessage());
                 }
             }
         }
@@ -282,7 +365,7 @@ class SubmissionController extends Controller
         try {
             $submissions = $query->orderBy('created_at', 'desc')->get();
         } catch (\Exception $e) {
-            \Log::error('Error executing export query', [
+            Log::error('Error executing export query', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
                 'request_params' => $request->all()
@@ -373,8 +456,27 @@ class SubmissionController extends Controller
      */
     public function statistics(Interview $interview)
     {
-        // Check if user owns this interview
-        if ($interview->created_by !== Auth::id()) {
+        // Check if user has access to this interview
+        $hasAccess = false;
+        
+        // Admin can access all interviews
+        if (Auth::user()->role === 'admin') {
+            $hasAccess = true;
+        }
+        // Interview creator can access their interviews
+        elseif ($interview->created_by === Auth::id()) {
+            $hasAccess = true;
+        }
+        // Reviewer can access if they are assigned to review this interview
+        elseif (Auth::user()->role === 'reviewer') {
+            $assignment = \App\Models\ReviewAssignment::where('interview_id', $interview->id)
+                ->where('reviewer_id', Auth::id())
+                ->where('status', 'accepted')
+                ->first();
+            $hasAccess = $assignment !== null;
+        }
+        
+        if (!$hasAccess) {
             abort(403, 'You do not have access to this interview.');
         }
 

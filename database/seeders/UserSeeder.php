@@ -25,37 +25,17 @@ class UserSeeder extends Seeder
         // Create reviewer user
         User::create([
             'name' => 'Reviewer User',
-            'email' => 'reviewer@hireflixclone.com',
+            'email' => 'shubham27844872@gmail.com',
             'password' => Hash::make('password'),
             'role' => 'reviewer',
             'email_verified_at' => now(),
         ]);
 
-        // Create additional reviewer for testing
-        User::create([
-            'name' => 'John Reviewer',
-            'email' => 'john.reviewer@hireflixclone.com',
-            'password' => Hash::make('password'),
-            'role' => 'reviewer',
-            'email_verified_at' => now(),
-        ]);
-
-        // Create another admin for testing
-        User::create([
-            'name' => 'HR Manager',
-            'email' => 'hr@hireflixclone.com',
-            'password' => Hash::make('password'),
-            'role' => 'admin',
-            'email_verified_at' => now(),
-        ]);
 
         $this->command->info('✅ Default users created successfully!');
         $this->command->info('');
         $this->command->info('🔑 Admin Credentials:');
         $this->command->info('   Email: admin@hireflixclone.com');
-        $this->command->info('   Password: password');
-        $this->command->info('');
-        $this->command->info('   Email: hr@hireflixclone.com');
         $this->command->info('   Password: password');
         $this->command->info('');
         $this->command->info('👥 Reviewer Credentials:');

@@ -121,7 +121,7 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <a href="{{ route('reviews.show', $review) }}" class="text-blue-600 hover:text-blue-900 mr-3">View</a>
-                                    @if($review->reviewer_id === Auth::id() || Auth::user()->hasRole('admin'))
+                                    @if($review->reviewer_id === Auth::id() || Auth::user()->role === 'admin')
                                         <a href="{{ route('reviews.edit', $review) }}" class="text-green-600 hover:text-green-900">Edit</a>
                                     @endif
                                 </td>
